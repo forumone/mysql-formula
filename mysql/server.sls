@@ -38,7 +38,11 @@ mysql_root_password:
     - require:
       - service: mysqld
 
-{% for host in ['localhost', 'localhost.localdomain', salt['grains.get']('fqdn')] %}
+{% if salt['grains.get']('fqdn') == 'localhost.localdomain' %}
+{% set hosts = ['localhost', 'localhost.localdomain' ] %}
+{% set hosts = ['localhost', 'localhost.localdomain', salt['grains.get']('fqdn')] %}
+
+{% for host in hosts %}
 mysql_delete_anonymous_user_{{ host }}:
   mysql_user:
     - absent
@@ -57,6 +61,7 @@ mysql_delete_anonymous_user_{{ host }}:
       - cmd: mysql_root_password
       {%- endif %}
 {% endfor %}
+{% endif %}
 {% endif %}
 {% endif %}
 
