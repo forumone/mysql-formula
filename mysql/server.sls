@@ -40,6 +40,7 @@ mysql_root_password:
 
 {% if salt['grains.get']('fqdn') == 'localhost.localdomain' %}
 {% set hosts = ['localhost', 'localhost.localdomain' ] %}
+{% else %}
 {% set hosts = ['localhost', 'localhost.localdomain', salt['grains.get']('fqdn')] %}
 
 {% for host in hosts %}
