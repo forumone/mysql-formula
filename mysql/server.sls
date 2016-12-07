@@ -42,6 +42,7 @@ mysql_root_password:
 {% set hosts = ['localhost', 'localhost.localdomain' ] %}
 {% else %}
 {% set hosts = ['localhost', 'localhost.localdomain', salt['grains.get']('fqdn')] %}
+{% endif %}
 
 {% for host in hosts %}
 mysql_delete_anonymous_user_{{ host }}:
@@ -62,7 +63,6 @@ mysql_delete_anonymous_user_{{ host }}:
       - cmd: mysql_root_password
       {%- endif %}
 {% endfor %}
-{% endif %}
 {% endif %}
 {% endif %}
 
