@@ -30,15 +30,17 @@ include:
     - name: /etc/mysql/{{ database }}.schema
     - source: {{ salt['pillar.get'](['mysql', 'schema', database, 'source']|join(':')) }}
 {%- set template_type = salt['pillar.get'](['mysql', 'schema', database, 'template']|join(':'), False) %}
+{%- set template_context = salt['pillar.get'](['mysql', 'schema', database, 'context']|join(':'), {}) %}
 {%- if template_type %}
     - template: {{ template_type }}
+    - context: {{ template_context|yaml }}
 {% endif %}
     - user: {{ salt['pillar.get']('mysql:server:user', 'mysql') }}
     - makedirs: True
 
 {{ state_id }}_load:
   cmd.wait:
-    - name: mysql -u {{ mysql_salt_user }} -p{{ mysql_salt_pass }} {{ database }} < /etc/mysql/{{ database }}.schema
+    - name: mysql -u {{ mysql_salt_user }} -h{{ mysql_host }} -p{{ mysql_salt_pass }} {{ database }} < /etc/mysql/{{ database }}.schema
     - watch:
       - file: {{ state_id }}_schema
       - mysql_database: {{ state_id }}
