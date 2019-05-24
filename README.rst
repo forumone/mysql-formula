@@ -2,7 +2,7 @@
 mysql
 =====
 
-Install the MySQL client and/or server.
+Install the MySQL client and/or server on Linux and MacOS.
 
 .. note::
 
@@ -18,23 +18,29 @@ Available states
 ``mysql``
 ---------
 
-Meta-state that includes all server packages in the correct order.
+Meta-state including all server packages in correct order. This meta-state does **not** include ``mysql.remove_test_database``.
 
-This meta-state does **not** include ``mysql.remove_test_database``; see
-below for details.
+``mysql.macos``
+----------------
+
+Install "MySQL Community Server", "MySQL Workbench", and other related mysql products on MacOS (and create Desktop shortcuts).
+
+``mysql.macos.remove``
+----------------
+
+Remove "MySQL Community Server", "MySQL Workbench", and any other enabled products from MacOS.
 
 ``mysql.client``
 ----------------
 
-Install the MySQL client package.
+Install the MySQL client package on Linux.
 
 ``mysql.server``
 ----------------
 
 Install the MySQL server package and start the service.
 
-Debian OS family supports setting MySQL root password during install via
-debconf.
+Debian OS family supports setting MySQL root password during install via debconf.
 
 .. note::
 
@@ -44,6 +50,12 @@ debconf.
     we use the not-at-all random ``grains.server_id``. As this is
     cryptographically insecure, future formula versions should use the
     newly available ``random.get_str`` method.
+
+``mysql.server_checks``
+-----------------------
+
+Enforces a root password to be set.
+
 
 ``mysql.disabled``
 ------------------
@@ -106,3 +118,20 @@ Add the official MySQL 5.7 repository.
     Debian and Suse support to be added. Also need to add the option to allow
     selection of MySQL version (5.6 and 5.5 repos are added but disabled) and
     changed enabled repository accordingly.
+
+``mysql.config``
+------------------
+
+Manage the MySQL configuration.
+
+.. note::
+    There are currently two common ways to configure MySQL, a monolithic configuration file
+    or a configuration directory with configuration files per component. By default this
+    state will use a configuration directory for CentOS and Fedora, and a monolithic
+    configuration file for all other supported OSes.
+
+    Whether the configuration directory is used or not depends on whether `mysql.config_directory`
+    is defined in the pillar. If it is present it will pick the configuration from individual
+    component keys (`mysql.server`, `mysql.galera`, `mysql.libraries`, etc) with optional global
+    configuration from `mysql.global`. The monolithic configuration, however, is defined separately
+    in `mysql.config`.

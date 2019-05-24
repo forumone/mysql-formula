@@ -1,5 +1,4 @@
-{% from "mysql/defaults.yaml" import rawmap with context %}
-{%- set mysql = salt['grains.filter_by'](rawmap, grain='os', merge=salt['pillar.get']('mysql:server:lookup')) %}
+{% from tpldir ~ "/map.jinja" import mysql with context %}
 {%- set mysql_root_user = salt['pillar.get']('mysql:server:root_user', 'root') %}
 {%- set mysql_root_pass = salt['pillar.get']('mysql:server:root_password', salt['grains.get']('server_id')) %}
 {%- set mysql_host = salt['pillar.get']('mysql:server:host', 'localhost') %}
@@ -10,7 +9,7 @@
 {% set user_hosts = [] %}
 
 include:
-  - mysql.python
+  - .python
 
 {% for name, user in salt['pillar.get']('mysql:user', {}).items() %}
 
@@ -35,22 +34,28 @@ include:
 
 {% set state_id = 'mysql_user_' ~ name ~ '_' ~ host%}
 {{ state_id }}:
-  mysql_user.present:
-    - name: {{ name }}
-    - host: '{{ host }}'
-  {%- if user['password_hash'] is defined %}
-    - password_hash: '{{ user['password_hash'] }}'
-  {%- elif user['password'] is defined and user['password'] != None %}
-    - password: '{{ user['password'] }}'
+  {%- if user.get('present', True) %}
+    mysql_user.present:
+      - name: {{ name }}
+      - host: '{{ host }}'
+    {%- if user['password_hash'] is defined %}
+      - password_hash: '{{ user['password_hash'] }}'
+    {%- elif user['password'] is defined and user['password'] != None %}
+      - password: '{{ user['password'] }}'
+    {%- else %}
+      - allow_passwordless: True
+    {%- endif %}
   {%- else %}
-    - allow_passwordless: True
+    mysql_user.absent:
+      - name: {{ name }}
+      - host: '{{ host }}'
   {%- endif %}
-    - connection_host: '{{ mysql_host }}'
-    - connection_user: '{{ mysql_salt_user }}'
-    {% if mysql_salt_pass %}
-    - connection_pass: '{{ mysql_salt_pass }}'
-    {% endif %}
-    - connection_charset: utf8
+      - connection_host: '{{ mysql_host }}'
+      - connection_user: '{{ mysql_salt_user }}'
+  {%- if mysql_salt_pass %}
+      - connection_pass: '{{ mysql_salt_pass }}'
+  {%- endif %}
+      - connection_charset: utf8
 
 {%- if 'grants' in user %}
 {{ state_id ~ '_grants' }}:
@@ -59,6 +64,22 @@ include:
     - grant: {{ user['grants']|join(",") }}
     - database: '*.*'
     - grant_option: {{ user['grant_option'] | default(False) }}
+    {% if 'ssl' in user or 'ssl-X509' in user %}
+    - ssl_option:
+      - SSL: {{ user['ssl'] | default(False) }}
+    {% if user['ssl-X509'] is defined %}
+      - X509: {{ user['ssl-X509'] }}
+    {% endif %}
+    {% if user['ssl-SUBJECT'] is defined %}
+      - SUBJECT: {{ user['ssl-SUBJECT'] }}
+    {% endif %}
+    {% if user['ssl-ISSUER'] is defined %}
+      - ISSUER: {{ user['ssl-ISSUER'] }}
+    {% endif %}
+    {% if user['ssl-CIPHER'] is defined %}
+      - CIPHER: {{ user['ssl-CIPHER'] }}
+    {% endif %}
+    {% endif %}
     - user: {{ name }}
     - host: '{{ host }}'
     - connection_host: '{{ mysql_host }}'
@@ -97,6 +118,7 @@ include:
     {% endif %}
     - user: {{ name }}
     - host: '{{ host }}'
+    - escape: {{ db['escape'] | default(True) }}
     - connection_host: '{{ mysql_host }}'
     - connection_user: '{{ mysql_salt_user }}'
     {% if mysql_salt_pass -%}
