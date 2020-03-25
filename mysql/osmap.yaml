@@ -77,7 +77,7 @@ Amazon:
   service: mariadb
   pythonpkg: MySQL-python
   server_config:
-    file: my.cnf
+#    file: my.cnf
     sections:
       mysqld_safe:
         log-error: /var/log/mariadb/mariadb.log
