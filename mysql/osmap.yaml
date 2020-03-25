@@ -76,7 +76,7 @@ Amazon:
   clientpkg: mariadb
   service: mariadb
   pythonpkg: MySQL-python
-  config_directory: /etc/
+  config_directory: /etc/my.cnf.d/
   server_config:
 #    file: my.cnf
     sections:
