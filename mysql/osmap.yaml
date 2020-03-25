@@ -76,7 +76,6 @@ Amazon:
   clientpkg: mariadb
   service: mariadb
   pythonpkg: MySQL-python
-  config_directory: /etc/my.cnf.d/
   server_config:
 #    file: server.cnf
     sections:
@@ -86,6 +85,8 @@ Amazon:
       mysqld:
         socket: /var/lib/mysql/mysql.sock
 #        bind_address: 127.0.0.1
+    append: |
+      !includedir /etc/my.cnf.d/
 {% else %}
   clientpkg: mysql
   service: mysqld
