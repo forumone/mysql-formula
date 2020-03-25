@@ -76,7 +76,7 @@ Amazon:
   clientpkg: mariadb
   service: mariadb
   pythonpkg: MySQL-python
-{% elif %}
+{% else %}
   clientpkg: mysql
   service: mysqld
   pythonpkg: MySQL-python
