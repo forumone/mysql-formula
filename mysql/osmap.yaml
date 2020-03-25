@@ -76,12 +76,13 @@ Amazon:
   clientpkg: mariadb
   service: mariadb
   pythonpkg: MySQL-python
+  config_directory: /etc/my.cnf.d/
   server_config:
 #    file: server.cnf
     sections:
       mysqld_safe:
-        log_error: /var/log/mariadb/mariadb.log
-        pid_file: /var/run/mariadb/mariadb.pid
+        log-error: /var/log/mariadb/mariadb.log
+        pid-file: /var/run/mariadb/mariadb.pid
       mysqld:
         socket: /var/lib/mysql/mysql.sock
 #        bind_address: 127.0.0.1
