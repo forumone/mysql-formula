@@ -78,7 +78,7 @@ Amazon:
   pythonpkg: MySQL-python
   config_directory: /etc/my.cnf.d/
   server_config:
-#    file: my.cnf
+    file: my.cnf
     sections:
       mysqld_safe:
         log-error: /var/log/mariadb/mariadb.log
