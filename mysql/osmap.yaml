@@ -71,7 +71,7 @@ Fedora:
         wsrep_sst_auth: "root:"
 
 Amazon:
-{% if osmajorrelease = "2" %}
+{% if osmajorrelease == "2" %}
   serverpkg: mariadb-server
   clientpkg: mariadb
   service: mariadb
