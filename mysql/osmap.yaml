@@ -1,6 +1,9 @@
 # -*- coding: utf-8 -*-
 # vim: ft=yaml
 ---
+
+{% set osmajorrelease = salt['grains.get']('osmajorrelease', osrelease)|string %}
+
 Debian:
   service: mysql
 
@@ -68,6 +71,13 @@ Fedora:
         wsrep_sst_auth: "root:"
 
 Amazon:
+{% if osmajorrelease = "2" %}
+  serverpkg: mariadb-server
+  clientpkg: mariadb
+  service: mariadb
+  pythonpkg: MySQL-python
+{% elif %}
   clientpkg: mysql
   service: mysqld
   pythonpkg: MySQL-python
+{% endif %}
